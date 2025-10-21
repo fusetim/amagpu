@@ -114,14 +114,14 @@ int main(int argc, char **argv)
 	cl::Buffer* inputBuf = buf1;
 	cl::Buffer* outputBuf = buf2;
 	unsigned int k = n;
+	image_t downsampled;
+	downsampled.data = new unsigned char[inputImage.width * inputImage.height * 4];
 	while (k > 2)
 	{
 		k--;
 		// Downsampled one time
-		image_t downsampled;
 		downsampled.width = 1 << k;
 		downsampled.height = 1 << k;
-		downsampled.data = new unsigned char[downsampled.width * downsampled.height * 4];
 
 		// Set kernel arguments
 		kernel->setArg(0, *inputBuf);
@@ -149,7 +149,6 @@ int main(int argc, char **argv)
 		saveDownsampled(outputDir, k, downsampled);
 
 		// Ping-pong buffers
-		free(downsampled.data);
 		cl::Buffer* temp = inputBuf;
 		inputBuf = outputBuf;
 		outputBuf = temp;
@@ -157,5 +156,6 @@ int main(int argc, char **argv)
 
 	// Free image data
 	free(inputImage.data);
+	free(downsampled.data);
 	return 0;
 }
