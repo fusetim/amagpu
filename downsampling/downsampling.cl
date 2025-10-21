@@ -1,29 +1,33 @@
-__kernel void mainKernel(
-    __global const int *a,
-    __global const int *b,
-    __global int *c,
-    __local int *local_table)
-{
-    int id = get_global_id( 0 );
-    c[ id ] = a[ id ] + b[ id ];
+__kernel void downsample(__global unsigned char *inputImage,
+                         __global unsigned char *outputImage,
+                         const unsigned int side) {
+  // x,y are coordinates in the output image
+  unsigned int x = get_global_id(0);
+  unsigned int y = get_global_id(1);
+  unsigned int input_width = side * 2;
 
-    // prefetch 
-    int lid = get_local_id( 0 );
-    local_table[lid] = c[id];
+  int idx = (y * side + x) * 4;
 
-    // barrier to ensure all writes to local memory are done
-    // note this only blocks work-items in the same work-group until local memory is coherent
-    barrier( CLK_LOCAL_MEM_FENCE );
-    // if you need global memory to be coherent, use: barrier( CLK_GLOBAL_MEM_FENCE );
-    // however this will never block work-items from other work-groups
+  // Simple downsampling by averaging 2x2 pixels
+  unsigned int topleft = ((2 * y) * input_width + (2 * x)) * 4;
+  unsigned int topright = ((2 * y) * input_width + (2 * x + 1)) * 4;
+  unsigned int bottomleft = ((2 * y + 1) * input_width + (2 * x)) * 4;
+  unsigned int bottomright = ((2 * y + 1) * input_width + (2 * x + 1)) * 4;
 
-    if (lid == 0) {
-        // only work-item 0 in each work-group does the cumulative some of the work group
-        int local_sum = 0;
-        int local_size = get_local_size(0);
-        for (int i = 0; i < local_size; i++) {
-            local_sum += local_table[i];
-        }
-        c[id] = local_sum;
-    }
+  unsigned int sumR = inputImage[topleft] + inputImage[topright] +
+                      inputImage[bottomleft] + inputImage[bottomright];
+
+  unsigned int sumG = inputImage[topleft + 1] + inputImage[topright + 1] +
+                      inputImage[bottomleft + 1] + inputImage[bottomright + 1];
+
+  unsigned int sumB = inputImage[topleft + 2] + inputImage[topright + 2] +
+                      inputImage[bottomleft + 2] + inputImage[bottomright + 2];
+
+  unsigned int sumA = inputImage[topleft + 3] + inputImage[topright + 3] +
+                      inputImage[bottomleft + 3] + inputImage[bottomright + 3];
+
+  outputImage[idx] = sumR / 4;
+  outputImage[idx + 1] = sumG / 4;
+  outputImage[idx + 2] = sumB / 4;
+  outputImage[idx + 3] = sumA / 4;
 }

@@ -6,3 +6,5 @@ CMakeFiles/
 *.so*
 *_config.h
 bin/
+inputs/
+outputs/
