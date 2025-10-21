@@ -1,0 +1,8 @@
+cmake_install.cmake
+CMakeCache.txt
+CMakeLists.txt
+Makefile 
+CMakeFiles/
+*.so*
+*_config.h
+bin/
