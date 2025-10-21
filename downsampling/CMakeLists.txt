@@ -20,7 +20,7 @@ ELSE (WIN32)
 ENDIF(WIN32)
 
 add_definitions(-DSRC_PATH=\"${CMAKE_SOURCE_DIR}/\")
-add_executable(downsampling downsampling.cpp downsampling.cl imageadp.cpp imageadp.cpp common/clutils.cpp lib/lodepng.cpp)
+add_executable(downsampling downsampling.cpp downsampling.cl common/clutils.cpp lib/lodepng.cpp)
 if(APPLE)
 	target_link_libraries(downsampling "-framework OpenCL" )
 else()
