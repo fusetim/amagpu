@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-project(trigraph)
+project(median)
 set (CMAKE_CXX_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -20,11 +20,11 @@ ELSE (WIN32)
 ENDIF(WIN32)
 
 add_definitions(-DSRC_PATH=\"${CMAKE_SOURCE_DIR}/\")
-add_executable(trigraph trigraph.cpp trigraph.cl common/clutils.cpp)
+add_executable(median median.cpp median.cl common/clutils.cpp lib/lodepng.cpp)
 if(APPLE)
-	target_link_libraries(trigraph "-framework OpenCL" )
+	target_link_libraries(median "-framework OpenCL" )
 else()
-	target_link_libraries(trigraph ${CL_LIBRARIES})
+	target_link_libraries(median ${CL_LIBRARIES})
 endif()
 
 add_subdirectory(OpenCL-ICD-Loader)
